@@ -1,17 +1,36 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {authContext} from '../context/AuthContext.tsx'
+import { useNavigate } from 'react-router-dom';
+
 const Login = () => {
   const baseUrl = import.meta.env.VITE_API_URL;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const { dispatch } = useContext(authContext)
+  const navigate = useNavigate()
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await axios.post(`${baseUrl}/api/user/login`, { email, password });
+      const res = await axios.post(`${baseUrl}/api/user/login`, { email, password });
+      const result = await res.data
+
+      console.log(result)
+      dispatch({
+        type : 'LOGIN_SUCCESS',
+        payload:{
+          user: {
+            id: result.user._id,
+            name: result.user.name,
+          },
+          token:result.token
+        },
+      });
+      
       toast.success('Login successful!');
+      navigate('/teacher-home')
 
     } catch (error) {
       if (axios.isAxiosError(error)) {

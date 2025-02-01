@@ -1,7 +1,15 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { authContext } from '../context/AuthContext';
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user } = useContext(authContext);
+  const { dispatch } = useContext(authContext);
 
+  const Logout = () => {
+    dispatch({
+        type: 'LOGOUT',
+    });   
+  }
   return (
     <nav className="bg-white shadow-lg fixed w-full z-20 top-0 left-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,23 +29,41 @@ const Navbar = () => {
               </a>
             </div>
           </div>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-            <a 
-              href="/login" 
-              className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Login
-            </a>
-            <a 
-              href="/register" 
-              className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition duration-300"
-            >
-              Register
-            </a>
-          </div>
-          
+            {user ? (
+                <>
+                <a
+                    className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                    Hi {user?.name}
+                </a>
+                <button
+                    onClick={Logout}
+                    className="text-gray-700 bg-red-500 px-4 py-2 hover:text-gray-900 rounded-md text-sm font-medium"
+                >
+                    Logout
+                </button>
+                </>
+            ) : (
+                <>
+                <a
+                    href="/login"
+                    className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                    Login
+                </a>
+                <a
+                    href="/register"
+                    className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition duration-300"
+                >
+                    Register
+                </a>
+                </>
+            )}
+            </div>
+
           {/* Mobile Menu Button */}
           <div className="-mr-2 flex items-center sm:hidden">
             <button 
