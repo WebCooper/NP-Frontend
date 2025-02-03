@@ -1,12 +1,12 @@
 import { useState, useContext } from 'react';
-import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {authContext} from '../context/AuthContext.tsx'
 import { useNavigate } from 'react-router-dom';
+import * as React from "react";
+import {loginTeacher} from "../lib/utils/auth/authService.ts";
 
 const Login = () => {
-  const baseUrl = import.meta.env.VITE_API_URL;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { dispatch } = useContext(authContext)
@@ -14,8 +14,7 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${baseUrl}/api/user/login`, { email, password });
-      const result = await res.data
+      const result = await loginTeacher({email, password})
 
       console.log(result)
       dispatch({
@@ -33,10 +32,10 @@ const Login = () => {
       navigate('/teacher-home')
 
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data?.message || 'Invalid credentials');
+      if (error instanceof Error) {
+        toast.error(error.message);
       } else {
-        alert('An unexpected error occurred');
+        toast.error('An unknown error occurred');
       }
     }
   };
