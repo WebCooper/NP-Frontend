@@ -6,6 +6,7 @@ import TeacherHome from './pages/TeacherHome'
 import { BrowserRouter, Routes, Route } from'react-router-dom'
 import Navbar from './components/Navbar'
 import { AuthContextProvider } from './context/AuthContext';
+
 function App() {
   return (
     <BrowserRouter>
@@ -16,6 +17,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/teacher-home" element={<TeacherHome />} />
+
           </Routes>
         </AuthContextProvider>
     </BrowserRouter>
