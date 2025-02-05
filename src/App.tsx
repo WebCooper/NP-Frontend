@@ -6,7 +6,9 @@ import TeacherHome from './pages/TeacherHome'
 import { BrowserRouter, Routes, Route } from'react-router-dom'
 import Navbar from './components/Navbar'
 import { AuthContextProvider } from './context/AuthContext';
-
+import CreateQuiz from './pages/createQuiz'
+import UpdateQuiz from './pages/updateQuiz'
+import AddQuestions from './pages/AddQuestions'
 function App() {
   return (
     <BrowserRouter>
@@ -17,7 +19,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/teacher-home" element={<TeacherHome />} />
-
+            <Route path="/create-quiz" element={<CreateQuiz />} />
+            <Route path="/quiz/edit/:quizId" element={ <UpdateQuiz />} />
+            <Route path="/quiz/add-questions/:quizId" element={ <AddQuestions />} />
           </Routes>
         </AuthContextProvider>
     </BrowserRouter>
