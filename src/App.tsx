@@ -12,6 +12,7 @@ import AddQuestions from "./pages/AddQuestions";
 import { SocketProvider } from "./context/SocketContext.tsx";
 import WaitingRoom from "./pages/WaitingRoom.tsx";
 
+
 function App() {
   return (
       <SocketProvider>
@@ -24,13 +25,13 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/waiting-room/:roomId" element={<WaitingRoom />} />
 
+
             {/* Protected Routes (Require Authentication) */}
             <Route
                 path="/*"
                 element={
                   <AuthContextProvider>
-                    <Routes>
-                      <Route path="/home" element={<TeacherHome />} />
+                    <Routes><Route path="/home" element={<TeacherHome />} />
                       <Route path="/create-quiz" element={<CreateQuiz />} />
                       <Route path="/quiz/edit/:quizId" element={<UpdateQuiz />} />
                       <Route path="/quiz/add-questions/:quizId" element={<AddQuestions />} />
