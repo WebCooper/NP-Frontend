@@ -29,7 +29,7 @@ const Login = () => {
       });
       
       toast.success('Login successful!');
-      navigate('/teacher-home')
+      navigate('/home')
 
     } catch (error) {
       if (error instanceof Error) {
@@ -77,7 +77,7 @@ const Login = () => {
             type="submit"
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg"
           >
-            Teacher Login
+            Login
           </button>
           <div className='pt-5'>
             <h2>Don't have an account? <a href="/register" className="text-blue-600 hover:underline">Register</a></h2>

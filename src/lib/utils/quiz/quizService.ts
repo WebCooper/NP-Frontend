@@ -12,6 +12,10 @@ interface deleteQuizParams {
   quizId: string;
 }
 
+interface setLiveQuizParams {
+  quizId: string;
+}
+
 export const createQuiz = async ({title, userId}: createQuizParams) => {
   try {
     const response = await axiosInstance.post('api/quiz/create', {
@@ -38,5 +42,23 @@ export const deleteQuiz = async ({quizId}: deleteQuizParams) => {
     return response.data;
   } catch (error) {
     console.log("Deleting Quiz Error",error);
+  }
+}
+
+export const setLiveQuiz = async ({quizId}: setLiveQuizParams) => {
+  try {
+    const response = await axiosInstance.patch(`api/quiz/set-live/${quizId}`);
+    return response;
+  } catch (error) {
+    console.log("Setting Live Quiz Error",error);
+  }
+}
+
+export const setNotLiveQuiz = async ({quizId}: setLiveQuizParams) => {
+  try {
+    const response = await axiosInstance.patch(`api/quiz/set-not-live/${quizId}`);
+    return response.data;
+  } catch (error) {
+    console.log("Setting Not Live Quiz Error",error);
   }
 }

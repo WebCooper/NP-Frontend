@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getUserQuizes, deleteQuiz } from '../lib/utils/quiz/quizService';
+import { getUserQuizes, deleteQuiz ,setLiveQuiz} from '../lib/utils/quiz/quizService';
 import { authContext } from '../context/AuthContext';
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,27 +10,29 @@ const QuizList = () => {
   const userId = user?.id ?? ''; // Default to empty string if user is null or undefined
   
   const navigate = useNavigate();
-  const fetchQuizzes = async () => {
-    try {
-      if (user?.id) {
-        const result = await getUserQuizes({ userId });
-        setQuizzes(result);
-      }
-    } catch (error) {
-      console.error('Error fetching quizzes:', error);
-    } 
-  };
+
 
   useEffect(() => {
-    fetchQuizzes();
-  }, [userId]);
+    const fetchQuizzes = async () => {
+      try {
+        if (userId) {
+          const result = await getUserQuizes({ userId });
+          setQuizzes(result);
+        }
+      } catch (error) {
+        console.error('Error fetching quizzes:', error);
+      }
+    };
+
+    fetchQuizzes().then(() => console.log('Quizzes fetched successfully!'));
+  }, [userId, quizzes]);
 
   const handleDelete = async (quizId: string) => {
     try {
       const result = await deleteQuiz({quizId});
       console.log(result)
       setQuizzes((prevQuizzes) => prevQuizzes.filter((quiz) => quiz.id !== quizId));
-      fetchQuizzes();
+
     } 
     catch (error) {
       console.error('Error deleting quiz:', error);
@@ -41,9 +43,23 @@ const QuizList = () => {
     navigate(`/quiz/edit/${quizId}`);
   }
   
-  const handleaddQuestions = (quizId: string) => {
+  const handleAddQuestions = (quizId: string) => {
     navigate(`/quiz/add-questions/${quizId}`);
   }
+
+  const handleSetLive = async (quizId: string) => {
+    try {
+      const response = await setLiveQuiz({ quizId });
+
+      if (response && response.data.roomId) {
+        navigate(`/waiting-room/${response.data.roomId}`); // Redirect to the correct room
+      } else {
+        console.error("Failed to get room ID");
+      }
+    } catch (error) {
+      console.error("Error setting quiz live:", error);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -64,7 +80,7 @@ const QuizList = () => {
       </div>
       <div className="flex space-x-3">
         <button
-          onClick={() => handleaddQuestions(quiz._id)}
+          onClick={() => handleAddQuestions(quiz._id)}
           className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md"
         >
         AddQuestions+
@@ -80,6 +96,11 @@ const QuizList = () => {
           className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded-md"
         >
           Delete
+        </button>
+        <button
+        onClick={() => handleSetLive(quiz._id)}
+        className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md">
+          Set Live
         </button>
       </div>
     </div>

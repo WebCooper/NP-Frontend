@@ -104,7 +104,7 @@ export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     
     if (isAuthenticated && location.pathname === '/login') {
       // Redirect to home if trying to access login while authenticated
-      navigate('/teacher-home');
+      navigate('/home');
     }
   }, [state.user, state.token, navigate, location]);
 
