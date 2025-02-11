@@ -21,7 +21,7 @@ const Landing = () => {
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
-            Teacher Login
+            Login
           </button>
           
           <button onClick={() => window.location.href = '/register'} className="w-full flex items-center justify-center bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-300">
@@ -31,7 +31,7 @@ const Landing = () => {
               <line x1="20" y1="8" x2="20" y2="14"/>
               <line x1="23" y1="11" x2="17" y2="11"/>
             </svg>
-            Teacher Sign Up
+            Sign Up
           </button>
           
           <div className="text-center text-gray-500 my-4 relative">
