@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSocket } from "../context/SocketContext";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import the useAuth hook
 
 interface Participant {
     id: string;
@@ -18,7 +19,8 @@ const WaitingRoom: React.FC = () => {
     const { socket } = useSocket();
     const { roomId } = useParams<{ roomId: string }>();
     const [participants, setParticipants] = useState<Participant[]>([]);
-    const [username] = useState<string>(generateRandomUsername());
+    const { user } = useAuth(); // Get the authenticated user from AuthContext
+    const [username] = useState<string>(user ? user.name : generateRandomUsername()); // Use the user's name if logged in, otherwise generate a random username
 
     useEffect(() => {
         if (!socket || !roomId) {
