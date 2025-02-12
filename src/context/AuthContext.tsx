@@ -18,7 +18,7 @@ type AuthAction =
     | { type: "LOGOUT" };
 
 // Public routes that don’t require authentication
-const PUBLIC_ROUTES = ["/login", "/register", "/"];
+const PUBLIC_ROUTES = ["/login", "/register", "/", "/waiting-room/*"];
 
 const getStoredUser = (): User => {
   try {
