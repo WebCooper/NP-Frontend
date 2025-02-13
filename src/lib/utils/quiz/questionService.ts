@@ -12,6 +12,12 @@ interface getAllQuestionsParams {
 interface deleteQuestionParams {
     questionId: string;
 }
+interface updateQuestionParams {
+    questionId: string;
+    questionText: string;
+    options: string[];
+    correctOption: number;
+}
   
 export const addQuestion = async ({quizId, questionText, options, correctOption}: addQuestionParams) => {
     try {
@@ -44,3 +50,15 @@ export const deleteQuestion = async ({questionId}: deleteQuestionParams) => {
       console.log("Deleting Question Error",error);
     }
 }
+export const updateQuestion = async ({questionId, questionText, options, correctOption}: updateQuestionParams) => {
+  try {
+      const response = await axiosInstance.patch(`api/question/${questionId}`, {
+          questionText,
+          options,
+          correctOption,
+      });
+      return response.data;
+  } catch (error) {
+      console.log("Updating Question Error", error);
+  }
+};

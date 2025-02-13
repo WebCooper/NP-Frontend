@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { addQuestion, getAllQuestions, deleteQuestion } from '../lib/utils/quiz/questionService';
+import { addQuestion, getAllQuestions, deleteQuestion, updateQuestion } from '../lib/utils/quiz/questionService';
 
 interface Question {
   _id?: string;  // Added _id to interface
@@ -18,6 +18,7 @@ const AddQuestions = () => {
   const [error, setError] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+
 
   useEffect(() => {
     fetchQuestions();
@@ -91,13 +92,34 @@ const AddQuestions = () => {
       setError('Failed to delete question');
     }
   };
-
+  
   const handleOptionChange = (index: number, value: string) => {
     const updatedOptions = [...options];
     updatedOptions[index] = value;
     setOptions(updatedOptions);
   };
 
+  
+  const handleUpdateQuestion = async (questionId?: string) => {
+    if (!questionId) return;
+
+    const questionToUpdate = questions.find(q => q._id === questionId);
+    if (!questionToUpdate) return;
+
+    try {
+      const response =await updateQuestion({
+        questionId,
+        questionText: questionToUpdate.questionText,
+        options: questionToUpdate.options,
+        correctOption: questionToUpdate.correctOption,
+      });
+      console.log(response);
+
+      setError('');
+    } catch (err) {
+      setError('Failed to update question');
+    }
+  };
 
   return (
     <div className="mt-20 max-w-4xl p-6 mx-auto">
@@ -165,13 +187,22 @@ const AddQuestions = () => {
                     </li>
                   ))}
                 </ul>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteQuestion(q._id)}
-                  className="mt-2 bg-red-600 py-2 px-4 rounded-md text-white hover:text-red-800"
-                >
-                  Delete Question
-                </button>
+                <div className='gap-2'>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteQuestion(q._id)}
+                    className="mt-2 bg-red-600 py-2 px-4 rounded-md text-white hover:text-red-800"
+                  >
+                    Delete Question
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleUpdateQuestion(q._id)}
+                    className="mt-2 bg-yellow-600 py-2 px-4 rounded-md text-white hover:text-red-800"
+                  >
+                    Update Question
+                  </button>
+                </div>
               </div>
             ))}
           </div>
