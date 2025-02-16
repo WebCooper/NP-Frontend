@@ -12,13 +12,12 @@ interface Question {
 const AddQuestions = () => {
   const { quizId } = useParams();
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [currentQuestion, setCurrentQuestion] = useState<string>('');
-  const [options, setOptions] = useState<string[]>(['', '', '', '']);
+  const [currentQuestion, setCurrentQuestion] = useState<string>("");
+  const [options, setOptions] = useState<string[]>(["", "", "", ""]);
   const [correctOption, setCorrectOption] = useState<number | null>(null);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
-
 
   useEffect(() => {
     fetchQuestions();
@@ -26,7 +25,7 @@ const AddQuestions = () => {
 
   const fetchQuestions = async () => {
     if (!quizId) return;
-    
+
     try {
       const response = await getAllQuestions({ quizId });
       if (response) {
@@ -34,7 +33,7 @@ const AddQuestions = () => {
       }
       console.log(response);
     } catch (err) {
-      setError('Failed to load questions');
+      setError("Failed to load questions");
     } finally {
       setIsFetching(false);
     }
@@ -42,12 +41,16 @@ const AddQuestions = () => {
 
   const handleAddQuestion = async () => {
     if (!quizId) {
-      setError('Quiz ID is missing');
+      setError("Quiz ID is missing");
       return;
     }
 
-    if (!currentQuestion || options.some(option => option === '') || correctOption === null) {
-      setError('Please complete all fields');
+    if (
+      !currentQuestion ||
+      options.some((option) => option === "") ||
+      correctOption === null
+    ) {
+      setError("Please complete all fields");
       return;
     }
 
@@ -63,51 +66,52 @@ const AddQuestions = () => {
 
       if (response) {
         const newQuestion: Question = {
-          _id: response._id,  // Include the _id from response
+          _id: response._id, // Include the _id from response
           questionText: currentQuestion,
           options,
           correctOption,
         };
-        
-        setQuestions(prevQuestions => [...prevQuestions, newQuestion]);  // Use functional update
-        setCurrentQuestion('');
-        setOptions(['', '', '', '']);
+
+        setQuestions((prevQuestions) => [...prevQuestions, newQuestion]); // Use functional update
+        setCurrentQuestion("");
+        setOptions(["", "", "", ""]);
         setCorrectOption(null);
-        setError('');
+        setError("");
       }
     } catch (err) {
-      setError('Failed to add question');
+      setError("Failed to add question");
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const handleDeleteQuestion = async (questionId?: string) => {
-    if (!questionId) return;  // Early return if no questionId
-    
+    if (!questionId) return; // Early return if no questionId
+
     try {
       await deleteQuestion({ questionId });
-      setQuestions(prevQuestions => prevQuestions.filter(q => q._id !== questionId));  // Use functional update
+      setQuestions((prevQuestions) =>
+        prevQuestions.filter((q) => q._id !== questionId)
+      ); // Use functional update
     } catch (err) {
-      setError('Failed to delete question');
+      setError("Failed to delete question");
     }
   };
-  
+
   const handleOptionChange = (index: number, value: string) => {
     const updatedOptions = [...options];
     updatedOptions[index] = value;
     setOptions(updatedOptions);
   };
 
-  
   const handleUpdateQuestion = async (questionId?: string) => {
     if (!questionId) return;
 
-    const questionToUpdate = questions.find(q => q._id === questionId);
+    const questionToUpdate = questions.find((q) => q._id === questionId);
     if (!questionToUpdate) return;
 
     try {
-      const response =await updateQuestion({
+      const response = await updateQuestion({
         questionId,
         questionText: questionToUpdate.questionText,
         options: questionToUpdate.options,
@@ -115,99 +119,118 @@ const AddQuestions = () => {
       });
       console.log(response);
 
-      setError('');
+      setError("");
     } catch (err) {
-      setError('Failed to update question');
+      setError("Failed to update question");
     }
   };
 
   return (
-    <div className="mt-20 max-w-4xl p-6 mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Add Your Questions</h1>
-      {error && (
-        <div className="bg-red-50 text-red-700 p-3 rounded-md mb-4">
-          {error}
+    <div className="container mx-auto px-8 mt-24 max-w-4xl">
+      <div className="flex flex-col gap-10">
+        <div className="border-b border-gray-200 pb-6">
+          <h1 className="text-3xl font-bold text-gray-900">Create Questions</h1>
+          <p className="text-gray-600 mt-2">
+            Add and manage questions for your quiz
+          </p>
         </div>
-      )}
 
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <input
-          type="text"
-          value={currentQuestion}
-          onChange={(e) => setCurrentQuestion(e.target.value)}
-          placeholder="Enter question"
-          className="w-full p-2 border border-gray-300 rounded-md mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-
-        {options.map((option, index) => (
-          <div key={index} className="flex items-center mb-2">
-            <input
-              type="text"
-              value={option}
-              onChange={(e) => handleOptionChange(index, e.target.value)}
-              placeholder={`Option ${index + 1}`}
-              className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mr-2"
-            />
-            <input
-              type="radio"
-              name="correctOption"
-              checked={correctOption === index}
-              onChange={() => setCorrectOption(index)}
-              className="h-4 w-4 text-blue-600"
-            />
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            {error}
           </div>
-        ))}
+        )}
 
-        <button
-          type="button"
-          onClick={handleAddQuestion}
-          disabled={isLoading}
-          className="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md mt-4 disabled:opacity-50"
-        >
-          {isLoading ? 'Adding Question...' : 'Add Question'}
-        </button>
-      </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-6">
+          <input
+            type="text"
+            value={currentQuestion}
+            onChange={(e) => setCurrentQuestion(e.target.value)}
+            placeholder="Enter your question"
+            className="w-full px-4 py-3 text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+          />
 
-      {questions.length > 0 && (
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4">Questions Added:</h3>
-          <div className="space-y-4">
-            {questions.map((q, index) => (
-              <div key={index} className="border-b pb-4 last:border-b-0">
-                <strong className="text-lg">{q.questionText}</strong>
-                <ul className="mt-2 space-y-1">
-                  {q.options.map((opt, i) => (
-                    <li
-                      key={i}
-                      className={`pl-4 ${
-                        i === q.correctOption ? 'text-green-600 font-medium' : ''
-                      }`}
-                    >
-                      {i + 1}. {opt}
-                    </li>
-                  ))}
-                </ul>
-                <div className='gap-2'>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteQuestion(q._id)}
-                    className="mt-2 bg-red-600 py-2 px-4 rounded-md text-white hover:text-red-800"
-                  >
-                    Delete Question
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleUpdateQuestion(q._id)}
-                    className="mt-2 bg-yellow-600 py-2 px-4 rounded-md text-white hover:text-red-800"
-                  >
-                    Update Question
-                  </button>
-                </div>
+          <div className="mt-6 space-y-4">
+            {options.map((option, index) => (
+              <div key={index} className="flex items-center gap-4">
+                <input
+                  type="text"
+                  value={option}
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+                  placeholder={`Option ${index + 1}`}
+                  className="flex-1 px-4 py-2 text-gray-900 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors"
+                />
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="correctOption"
+                    checked={correctOption === index}
+                    onChange={() => setCorrectOption(index)}
+                    className="w-4 h-4 text-blue-600"
+                  />
+                  <span className="text-sm text-gray-600">Correct</span>
+                </label>
               </div>
             ))}
           </div>
+
+          <button
+            onClick={handleAddQuestion}
+            disabled={isLoading}
+            className="mt-6 w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? "Adding Question..." : "Add Question"}
+          </button>
         </div>
-      )}
+
+        {questions.length > 0 && (
+          <div className="border border-gray-200 rounded-lg divide-y divide-gray-200">
+            <div className="px-6 py-4 bg-gray-50">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Added Questions
+              </h2>
+            </div>
+            {questions.map((question, index) => (
+              <div key={index} className="p-6 space-y-4">
+                <div className="flex justify-between items-start">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {question.questionText}
+                  </h3>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleUpdateQuestion(question._id)}
+                      className="text-gray-600 hover:text-gray-900 px-3 py-1 rounded border border-gray-200 text-sm"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteQuestion(question._id)}
+                      className="text-red-600 hover:text-red-700 px-3 py-1 rounded border border-gray-200 text-sm"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+                <ul className="space-y-2 ml-4">
+                  {question.options.map((option, i) => (
+                    <li
+                      key={i}
+                      className={`flex items-center gap-2 ${
+                        i === question.correctOption
+                          ? "text-green-600 font-medium"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      <span className="w-6">{i + 1}.</span>
+                      <span>{option}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
