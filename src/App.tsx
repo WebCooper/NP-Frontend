@@ -14,35 +14,29 @@ import WaitingRoom from "./pages/WaitingRoom.tsx";
 
 
 function App() {
-  return (
-      <SocketProvider>
-        <BrowserRouter>
-          <Navbar />
-          <Routes>
-            {/* Public Routes (Accessible by Everyone) */}
-            <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/waiting-room/:roomId" element={<WaitingRoom />} />
+    return (
+        <SocketProvider>
+            <BrowserRouter>
+                <AuthContextProvider> {/* Move AuthContextProvider inside BrowserRouter */}
+                    <Navbar />
+                    <Routes>
+                        {/* Public Routes (Accessible by Everyone) */}
+                        <Route path="/" element={<Landing />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/waiting-room/:roomId" element={<WaitingRoom />} />
 
-
-            {/* Protected Routes (Require Authentication) */}
-            <Route
-                path="/*"
-                element={
-                  <AuthContextProvider>
-                    <Routes><Route path="/home" element={<TeacherHome />} />
-                      <Route path="/create-quiz" element={<CreateQuiz />} />
-                      <Route path="/quiz/edit/:quizId" element={<UpdateQuiz />} />
-                      <Route path="/quiz/add-questions/:quizId" element={<AddQuestions />} />
+                        {/* Protected Routes (Require Authentication) */}
+                        <Route path="/home" element={<TeacherHome />} />
+                        <Route path="/create-quiz" element={<CreateQuiz />} />
+                        <Route path="/quiz/edit/:quizId" element={<UpdateQuiz />} />
+                        <Route path="/quiz/add-questions/:quizId" element={<AddQuestions />} />
                     </Routes>
-                  </AuthContextProvider>
-                }
-            />
-          </Routes>
-        </BrowserRouter>
-      </SocketProvider>
-  );
+                </AuthContextProvider>
+            </BrowserRouter>
+        </SocketProvider>
+    );
 }
+
 
 export default App;

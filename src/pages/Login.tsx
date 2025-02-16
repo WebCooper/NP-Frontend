@@ -2,14 +2,14 @@ import React, { useState, useContext } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { authContext } from "../context/AuthContext.tsx";
-import { useNavigate } from "react-router-dom";
+
 import { loginTeacher } from "../lib/utils/auth/authService.ts";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { dispatch } = useContext(authContext);
-  const navigate = useNavigate();
+
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,7 +32,7 @@ const Login = () => {
       console.log("Dispatch finished")
 
       toast.success("Login successful!");
-      navigate("/home");
+
     } catch (error) {
       console.error("Login Error:", error);
       toast.error(error instanceof Error ? error.message : "An error occurred");
