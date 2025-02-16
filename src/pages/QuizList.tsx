@@ -52,7 +52,7 @@ const QuizList = () => {
       const response = await setLiveQuiz({ quizId });
 
       if (response && response.data.roomId) {
-        navigate(`/waiting-room/${response.data.roomId}`); // Redirect to the correct room
+        navigate(`/room/${response.data.roomId}`); // Redirect to the correct room
       } else {
         console.error("Failed to get room ID");
       }
@@ -97,11 +97,14 @@ const QuizList = () => {
         >
           Delete
         </button>
-        <button
-        onClick={() => handleSetLive(quiz._id)}
-        className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md">
-          Set Live
-        </button>
+        {!quiz.isLive && (
+            <button
+                onClick={() => handleSetLive(quiz._id)}
+                className="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded-md">
+              Set Live
+            </button>
+        )}
+
       </div>
     </div>
   ))}
