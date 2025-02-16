@@ -153,7 +153,7 @@ const WaitingRoom: React.FC = () => {
             )}
 
             {quizState === "question" && currentQuestion && (
-                <div className="container">
+                <div className="container pt-20">
                     <QuestionProgress
                         currentQuestion={currentQuestion.questionNumber}
                         totalQuestions={currentQuestion.totalQuestions}
