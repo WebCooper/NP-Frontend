@@ -15,7 +15,7 @@ const CreateQuiz: React.FC = () => {
     try {
       const quizData = { title, userId};
       const result = await createQuiz(quizData);
-      navigate('/teacher-home')
+      navigate('/home')
       console.log(result);
     } catch (error) {
       console.error(error);

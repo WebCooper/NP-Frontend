@@ -26,14 +26,20 @@ export const registerTeacher = async ({name, email, password}: RegisterTeacherPa
    }
 }
 
-export const loginTeacher = async ({email, password}: LoginTeacherParams) => {
-    try{
-        const response = await axiosInstance.post('api/user/login', {
+export const loginTeacher = async ({ email, password }: LoginTeacherParams) => {
+    try {
+        const response = await axiosInstance.post("/api/user/login", {
             email,
             password,
-        })
+        });
+
+        if (response.status !== 200) {
+            throw new Error("Invalid login credentials");
+        }
+
         return response.data;
-    }catch (error) {
-        console.log("LoginTeacher Error",error);
+    } catch (error) {
+        console.error("LoginTeacher Error:", error);
+        throw new Error("Login failed. Please check your credentials.");
     }
-}
+};

@@ -1,10 +1,10 @@
-import { ReactNode, createContext, useEffect, useReducer , useContext} from "react";
+import React, { ReactNode, createContext, useReducer, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-// Define types for the user and auth state
+// Define types
 type User = {
   id: string;
-  name: string; 
+  name: string;
 } | null;
 
 type AuthState = {
@@ -12,19 +12,17 @@ type AuthState = {
   token: string | null;
 };
 
-type AuthAction = 
-  | { type: "LOGIN_START" }
-  | { type: "LOGIN_SUCCESS"; payload: { user: User; token: string } }
-  | { type: "LOGOUT" };
+type AuthAction =
+    | { type: "LOGIN_START" }
+    | { type: "LOGIN_SUCCESS"; payload: { user: User; token: string } }
+    | { type: "LOGOUT" };
 
-// Array of public routes that don't require authentication
-const PUBLIC_ROUTES = ['/login', '/register', '/']; 
+// Public routes that don’t require authentication
+const PUBLIC_ROUTES = ["/login", "/register", "/"];
 
 const getStoredUser = (): User => {
-  const storedUser = localStorage.getItem('user');
-  if (!storedUser) return null;
   try {
-    return JSON.parse(storedUser);
+    return JSON.parse(localStorage.getItem("user") || "null");
   } catch {
     return null;
   }
@@ -32,100 +30,67 @@ const getStoredUser = (): User => {
 
 const initialState: AuthState = {
   user: getStoredUser(),
-  token: localStorage.getItem('token') || null
+  token: localStorage.getItem("token"),
 };
 
+// Create auth context
 export const authContext = createContext<{
   user: User;
   token: string | null;
   dispatch: React.Dispatch<AuthAction>;
 }>({
-  ...initialState,
-  dispatch: () => undefined,
+  user: null,
+  token: null,
+  dispatch: () => {},
 });
 
+// Auth Reducer
 const authReducer = (state: AuthState, action: AuthAction): AuthState => {
   switch (action.type) {
     case "LOGIN_START":
-      return {
-        user: null,
-        token: null
-      };
+      return { ...state };
     case "LOGIN_SUCCESS":
-      return {
-        user: action.payload.user,
-        token: action.payload.token
-      };
+      localStorage.setItem("user", JSON.stringify(action.payload.user));
+      localStorage.setItem("token", action.payload.token);
+      return { user: action.payload.user, token: action.payload.token };
     case "LOGOUT":
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      return {
-        user: null,
-        token: null
-      };
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      return { user: null, token: null };
     default:
       return state;
   }
 };
 
-type AuthContextProviderProps = {
-  children: ReactNode;
-};
-
-export const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
+// Auth Provider
+export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Handle localStorage synchronization
-  useEffect(() => {
-    if (state.user) {
-      localStorage.setItem('user', JSON.stringify(state.user));
-    } else {
-      localStorage.removeItem('user');
-    }
-
-    if (state.token) {
-      localStorage.setItem('token', state.token);
-    } else {
-      localStorage.removeItem('token');
-    }
-  }, [state]);
-
   // Handle route protection
-  useEffect(() => {
-    const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
-    const isAuthenticated = !!(state.user && state.token);
+  React.useEffect(() => {
+    const isPublicRoute =
+        PUBLIC_ROUTES.includes(location.pathname) || location.pathname.startsWith("/room/");
+    const isAuthenticated = !!state.token;
 
     if (!isAuthenticated && !isPublicRoute) {
-      // Redirect to login only if trying to access protected route without auth
-      navigate('/login');
+      navigate("/login");
     }
-    
-    if (isAuthenticated && location.pathname === '/login') {
-      // Redirect to home if trying to access login while authenticated
-      navigate('/teacher-home');
+
+    if (isAuthenticated && location.pathname === "/login") {
+      navigate("/home");
     }
-  }, [state.user, state.token, navigate, location]);
+  }, [state.token, location, navigate]);
 
   return (
-    <authContext.Provider
-      value={{
-        user: state.user,
-        token: state.token,
-        dispatch
-      }}
-    >
-      {children}
-    </authContext.Provider>
+      <authContext.Provider value={{ ...state, dispatch }}>
+        {children}
+      </authContext.Provider>
   );
 };
 
-// Custom hook for easier context usage
+// Custom hook for consuming auth context
 export const useAuth = () => {
-  const context = useContext(authContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthContextProvider');
-  }
-  return context;
+  return useContext(authContext);
 };

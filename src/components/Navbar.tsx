@@ -32,6 +32,15 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
+            <div>
+              <a
+                href="/home"
+                className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Home
+              </a>
+            </div>
+
             {user ? (
                 <>
                 <a
