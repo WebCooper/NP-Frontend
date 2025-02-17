@@ -58,7 +58,7 @@ const QuizList = () => {
       const response = await setLiveQuiz({ quizId });
 
       if (response && response.data.roomId) {
-        navigate(`/waiting-room/${response.data.roomId}`); // Redirect to the correct room
+        navigate(`/room/${response.data.roomId}`); // Redirect to the correct room
       } else {
         console.error("Failed to get room ID");
       }

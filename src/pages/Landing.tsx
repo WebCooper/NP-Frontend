@@ -1,5 +1,24 @@
+import {ChangeEvent, useState} from "react";
+import { useNavigate} from "react-router-dom";
 
 const Landing = () => {
+
+  const [roomNumber, setRoomNumber] = useState("");
+  const navigate = useNavigate();
+
+  const handleOnChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setRoomNumber(event.target.value);
+  };
+
+  const handleEnterQuiz = () => {
+    if (/^\d{4}$/.test(roomNumber)) {
+      navigate(`/room/${roomNumber}`); // Navigate to the quiz room
+    } else {
+      alert("Please enter a valid 4-digit quiz ID.");
+    }
+  };
+
+
   return (
     <div className="min-h-screen  flex flex-col justify-center items-center p-4 ">
       <div className="w-full max-w-md mt-10 bg-white shadow-2xl rounded-xl overflow-hidden">
@@ -44,8 +63,9 @@ const Landing = () => {
               type="text" 
               placeholder="Enter Quiz Room ID" 
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={handleOnChange}
             />
-            <button className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-300">
+            <button className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-300" onClick={handleEnterQuiz}>
               Enter Quiz Room
             </button>
           </div>

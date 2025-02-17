@@ -18,7 +18,7 @@ type AuthAction =
     | { type: "LOGOUT" };
 
 // Public routes that don’t require authentication
-const PUBLIC_ROUTES = ["/login", "/register", "/", "/waiting-room/*"];
+const PUBLIC_ROUTES = ["/login", "/register", "/"];
 
 const getStoredUser = (): User => {
   try {
@@ -70,7 +70,8 @@ export const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 
   // Handle route protection
   React.useEffect(() => {
-    const isPublicRoute = PUBLIC_ROUTES.includes(location.pathname);
+    const isPublicRoute =
+        PUBLIC_ROUTES.includes(location.pathname) || location.pathname.startsWith("/room/");
     const isAuthenticated = !!state.token;
 
     if (!isAuthenticated && !isPublicRoute) {
