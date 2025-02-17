@@ -179,7 +179,7 @@ const WaitingRoom: React.FC = () => {
             )}
 
             {quizState === "completed" && (
-                <div className="container pt-20">
+                <div className="container pt-24">
                     <h2>🏆 Final Leaderboard 🏆</h2>
                     <ul>
                         {finalLeaderboard.map((entry, index) => (
