@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSocket } from "../context/SocketContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
 import WaitingRoomUI from "../components/WaitingRoomUi";
 import QuestionProgress from "../components/QuestionProgress";
 import QuestionDisplay from "../components/QuestionDisplay";
@@ -10,6 +9,8 @@ import RoundLeaderboard from "../components/RoundLeaderboard";
 import FinalLeaderboard from "../components/FinalLeaderBoard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import HostQuestionView from "../components/HostQuestionView.tsx";
+import {stopQuiz} from "../lib/utils/quiz/quizService.ts";
 
 interface Participant {
     id: string;
@@ -38,6 +39,14 @@ interface RoundLeaderboardEntry {
     isCorrect: boolean;
 }
 
+// Add these new interfaces
+interface HostQuizStatus {
+    totalParticipants: number;
+    answeredCount: number;
+    timeRemaining: number;
+}
+
+
 const WaitingRoom: React.FC = () => {
     const { socket } = useSocket();
     const { roomId } = useParams<{ roomId: string }>();
@@ -55,6 +64,12 @@ const WaitingRoom: React.FC = () => {
     const [roundResults, setRoundResults] = useState<RoundLeaderboardEntry[]>([]);
     const [finalLeaderboard, setFinalLeaderboard] = useState<LeaderboardEntry[]>([]);
     const [timeRemaining, setTimeRemaining] = useState<number>(0);
+
+    const [hostQuizStatus, setHostQuizStatus] = useState<HostQuizStatus>({
+        totalParticipants: 0,
+        answeredCount: 0,
+        timeRemaining: 0,
+    });
 
     const timerRef = useRef<number | null>(null);
 
@@ -79,6 +94,10 @@ const WaitingRoom: React.FC = () => {
             });
             navigate("/");
         });
+        socket.on("quiz-status-update", (status) => {
+            setHostQuizStatus(status);
+        });
+
 
         socket.on("question", ({ question }: { question: QuestionData }) => {
             setQuizState("question");
@@ -100,12 +119,12 @@ const WaitingRoom: React.FC = () => {
 
         socket.on("answer-result", ({ isCorrect }) => {
           if (isCorrect) {
-            toast.success("✅ Correct!", {
+            toast.success("Correct!", {
               position: "top-center",
               autoClose: 2000,
             });
           } else {
-            toast.error("❌ Wrong!", {
+            toast.error("Wrong!", {
               position: "top-center",
               autoClose: 2000,
             });
@@ -115,7 +134,7 @@ const WaitingRoom: React.FC = () => {
         socket.on("round-results", ({ roundLeaderboard, correctAnswer }) => {
             setQuizState("results");
             setRoundResults(roundLeaderboard);
-          toast.info(`✅ Correct answer was: ${correctAnswer}`, {
+          toast.info(`Correct answer was: ${correctAnswer}`, {
             position: "top-center",
             autoClose: 3000,
             });
@@ -124,7 +143,7 @@ const WaitingRoom: React.FC = () => {
         socket.on("quiz-completed", ({ finalLeaderboard }) => {
             setQuizState("completed");
             setFinalLeaderboard(finalLeaderboard);
-          toast.info("🎉 Quiz Completed! Check the final leaderboard.", {
+          toast.info("Quiz Completed! Check the final leaderboard.", {
             position: "top-center",
             autoClose: 3000,
             });
@@ -149,7 +168,7 @@ const WaitingRoom: React.FC = () => {
     const stopLiveQuiz = async () => {
         if (!quizId || !roomId) return;
         try {
-            await axios.patch(`http://localhost:4001/api/quiz/set-not-live/${quizId}`);
+            await stopQuiz({quizId});
             socket?.emit("end-quiz", { roomId });
         } catch {
           toast.info("Error stopping quiz.", {
@@ -177,21 +196,29 @@ const WaitingRoom: React.FC = () => {
           />
         )}
 
-        {quizState === "question" && currentQuestion && (
-          <div className="container pt-20">
-            <QuestionProgress
-              currentQuestion={currentQuestion.questionNumber}
-              totalQuestions={currentQuestion.totalQuestions}
-              timeRemaining={timeRemaining}
-            />
-            <QuestionDisplay
-              question={currentQuestion}
-              onAnswerSubmit={(answer) =>
-                socket?.emit("submit-answer", { roomId, answer })
-              }
-            />
-          </div>
-        )}
+            {quizState === "question" && currentQuestion && (
+                <div className="container pt-20">
+                    {isHost ? (
+                        <HostQuestionView
+                            questionData={currentQuestion}
+                            quizStatus={hostQuizStatus}
+                            timeRemaining={timeRemaining}
+                        />
+                    ) : (
+                        <>
+                            <QuestionProgress
+                                currentQuestion={currentQuestion.questionNumber}
+                                totalQuestions={currentQuestion.totalQuestions}
+                                timeRemaining={timeRemaining}
+                            />
+                            <QuestionDisplay
+                                question={currentQuestion}
+                                onAnswerSubmit={(answer) => socket?.emit("submit-answer", { roomId, answer })}
+                            />
+                        </>
+                    )}
+                </div>
+            )}
 
         {quizState === "results" && (
           <div className="pt-20">

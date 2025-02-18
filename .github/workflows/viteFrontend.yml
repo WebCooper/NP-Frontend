@@ -1,0 +1,45 @@
+name: Node.js CI Frontend
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    name: Build Frontend
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [22.14.0]
+
+    env:
+      VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+
+    steps:
+      # Checkout the code from GitHub repository
+      - uses: actions/checkout@v4
+
+      # Set up Node.js with the specified version
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+
+      # Install dependencies in the backend directory
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      # Set up environmental variables
+      - name: Add Environmental Variables
+        run: |
+          touch .env
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> .env
+
+      #
+      - name: Build Project
+        run: |
+          npm run build

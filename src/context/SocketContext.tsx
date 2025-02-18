@@ -5,7 +5,7 @@ import { io, Socket } from "socket.io-client";
 interface SocketContextType {
     socket: Socket | null;
 }
-
+const API_URL = import.meta.env.VITE_API_URL;
 // Create the context with an initial null value
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
@@ -27,7 +27,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     const [socket, setSocket] = useState<Socket | null>(null);
 
     useEffect(() => {
-        const newSocket = io("http://localhost:4001"); // Connect to backend
+        const newSocket = io(API_URL); // Connect to backend
         setSocket(newSocket);
 
         // Log the client ID when connected
