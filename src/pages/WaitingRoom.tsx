@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSocket } from "../context/SocketContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
 import WaitingRoomUI from "../components/WaitingRoomUi";
 import QuestionProgress from "../components/QuestionProgress";
 import QuestionDisplay from "../components/QuestionDisplay";
@@ -11,6 +10,7 @@ import FinalLeaderboard from "../components/FinalLeaderBoard";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import HostQuestionView from "../components/HostQuestionView.tsx";
+import {stopQuiz} from "../lib/utils/quiz/quizService.ts";
 
 interface Participant {
     id: string;
@@ -168,7 +168,7 @@ const WaitingRoom: React.FC = () => {
     const stopLiveQuiz = async () => {
         if (!quizId || !roomId) return;
         try {
-            await axios.patch(`http://localhost:4001/api/quiz/set-not-live/${quizId}`);
+            await stopQuiz({quizId});
             socket?.emit("end-quiz", { roomId });
         } catch {
           toast.info("Error stopping quiz.", {
