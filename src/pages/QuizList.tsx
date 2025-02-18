@@ -8,6 +8,9 @@ const QuizList = () => {
   const { user } = useContext(authContext);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const userId = user?.id ?? ""; // Default to empty string if user is null or undefined
+  const [roomIds, setRoomIds] = useState<{ [key: string]: string }>(() => {
+    return JSON.parse(localStorage.getItem("roomIds") || "{}");
+  });
 
   const navigate = useNavigate();
 
@@ -33,6 +36,10 @@ const QuizList = () => {
     fetchQuizzes().then(() => console.log("Quizzes fetched successfully!"));
   }, [userId, quizzes]);
 
+  useEffect(() => {
+    localStorage.setItem("roomIds", JSON.stringify(roomIds));
+  }, [roomIds]);
+
   const handleDelete = async (quizId: string) => {
     try {
       const result = await deleteQuiz({ quizId });
@@ -56,8 +63,8 @@ const QuizList = () => {
   const handleSetLive = async (quizId: string) => {
     try {
       const response = await setLiveQuiz({ quizId });
-
       if (response && response.data.roomId) {
+        setRoomIds((prevRoomIds) => ({ ...prevRoomIds, [quizId]: response.data.roomId }));
         navigate(`/room/${response.data.roomId}`); // Redirect to the correct room
       } else {
         console.error("Failed to get room ID");
@@ -67,19 +74,20 @@ const QuizList = () => {
     }
   };
 
+
   return (
-    <div className="grid grid-cols-1 gap-6">
-      {quizzes.map((quiz) => (
-        <div
-          key={quiz._id}
-          className="border border-gray-200 rounded-lg p-6 bg-white"
-        >
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h3 className="text-xl font-semibold text-gray-900">
-                {quiz.title}
-              </h3>
-              <div className="flex items-center gap-6 text-sm text-gray-600">
+      <div className="grid grid-cols-1 gap-6">
+        {quizzes.map((quiz) => (
+            <div
+                key={quiz._id}
+                className="border border-gray-200 rounded-lg p-6 bg-white"
+            >
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {quiz.title}
+                  </h3>
+                  <div className="flex items-center gap-6 text-sm text-gray-600">
                 <span>
                   {new Date(quiz.createdAt).toLocaleDateString("en-US", {
                     year: "numeric",
@@ -87,52 +95,62 @@ const QuizList = () => {
                     day: "numeric",
                   })}
                 </span>
-                <span
-                  className={`flex items-center gap-1.5 ${
-                    quiz.isLive ? "text-green-600" : "text-gray-600"
-                  }`}
-                >
+                    <span
+                        className={`flex items-center gap-1.5 ${
+                            quiz.isLive ? "text-green-600" : "text-gray-600"
+                        }`}
+                    >
                   <span
-                    className={`w-2 h-2 rounded-full ${
-                      quiz.isLive ? "bg-green-600" : "bg-gray-600"
-                    }`}
+                      className={`w-2 h-2 rounded-full ${
+                          quiz.isLive ? "bg-green-600" : "bg-gray-600"
+                      }`}
                   ></span>
-                  {quiz.isLive ? "Live" : "Not Live"}
+                      {quiz.isLive ? "Live" : "Not Live"}
                 </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {quiz.isLive && roomIds[quiz._id] ? (
+                      <button
+                          onClick={() => navigate(`/room/${roomIds[quiz._id]}`)}
+                          className="px-4 py-2 text-sm font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 rounded-lg transition-colors"
+                      >
+                        Go To Room
+                      </button>
+                  ) : (
+                      <button
+                          onClick={() => handleSetLive(quiz._id)}
+                          className="px-4 py-2 text-sm font-medium text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
+                      >
+                        Start Quiz
+                      </button>
+                  )}
+                  <button
+                      onClick={() => handleAddQuestions(quiz._id)}
+                      className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Add Questions
+                  </button>
+                  <button
+                      onClick={() => handleUpdate(quiz._id)}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
+                  >
+                    Edit
+                  </button>
+                  <button
+                      onClick={() => handleDelete(quiz._id)}
+                      className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => handleAddQuestions(quiz._id)}
-                className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-              >
-                Add Questions
-              </button>
-              <button
-                onClick={() => handleUpdate(quiz._id)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors"
-              >
-                Edit
-              </button>
-              <button
-                onClick={() => handleSetLive(quiz._id)}
-                className="px-4 py-2 text-sm font-medium text-green-600 hover:text-green-700 hover:bg-green-50 rounded-lg transition-colors"
-              >
-                Start Quiz
-              </button>
-              <button
-                onClick={() => handleDelete(quiz._id)}
-                className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
   );
+
 };
 
 export default QuizList;

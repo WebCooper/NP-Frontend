@@ -34,15 +34,23 @@ const Navbar = () => {
           <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
             <div>
               <a
-                href="/home"
+                href="/"
                 className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
-                Home
+                Enter to a Quiz
               </a>
             </div>
 
             {user ? (
                 <>
+                  <div>
+                    <a
+                        href="/home"
+                        className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      My Quizzes
+                    </a>
+                  </div>
                 <a
                     className="text-gray-700 hover:bg-gray-100 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
                 >

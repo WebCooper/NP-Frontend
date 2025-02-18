@@ -54,11 +54,11 @@ export const setLiveQuiz = async ({quizId}: setLiveQuizParams) => {
   }
 }
 
-export const setNotLiveQuiz = async ({quizId}: setLiveQuizParams) => {
+export const stopQuiz = async ({quizId}: deleteQuizParams) => {
   try {
     const response = await axiosInstance.patch(`api/quiz/set-not-live/${quizId}`);
-    return response.data;
+    return response;
   } catch (error) {
-    console.log("Setting Not Live Quiz Error",error);
+    console.log("Stopping Quiz Error",error);
   }
 }
