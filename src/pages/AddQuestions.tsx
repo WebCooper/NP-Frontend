@@ -18,6 +18,7 @@ const AddQuestions = () => {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(true);
+  
 
   useEffect(() => {
     fetchQuestions();
@@ -33,11 +34,13 @@ const AddQuestions = () => {
       }
       console.log(response);
     } catch (err) {
+      console.error("Error fetching questions:", err);
       setError("Failed to load questions");
     } finally {
       setIsFetching(false);
     }
   };
+  console.log(isFetching);
 
   const handleAddQuestion = async () => {
     if (!quizId) {
@@ -79,11 +82,14 @@ const AddQuestions = () => {
         setError("");
       }
     } catch (err) {
+      console.error("Error adding question:", err);
       setError("Failed to add question");
     } finally {
       setIsLoading(false);
     }
+    
   };
+  
 
   const handleDeleteQuestion = async (questionId?: string) => {
     if (!questionId) return; // Early return if no questionId
@@ -94,6 +100,7 @@ const AddQuestions = () => {
         prevQuestions.filter((q) => q._id !== questionId)
       ); // Use functional update
     } catch (err) {
+      console.error("Error deleting question:", err);
       setError("Failed to delete question");
     }
   };
@@ -121,6 +128,7 @@ const AddQuestions = () => {
 
       setError("");
     } catch (err) {
+      console.error("Error updating question:", err);
       setError("Failed to update question");
     }
   };
