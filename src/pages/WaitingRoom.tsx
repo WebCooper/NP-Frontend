@@ -119,12 +119,12 @@ const WaitingRoom: React.FC = () => {
 
         socket.on("answer-result", ({ isCorrect }) => {
           if (isCorrect) {
-            toast.success("✅ Correct!", {
+            toast.success("Correct!", {
               position: "top-center",
               autoClose: 2000,
             });
           } else {
-            toast.error("❌ Wrong!", {
+            toast.error("Wrong!", {
               position: "top-center",
               autoClose: 2000,
             });
@@ -134,7 +134,7 @@ const WaitingRoom: React.FC = () => {
         socket.on("round-results", ({ roundLeaderboard, correctAnswer }) => {
             setQuizState("results");
             setRoundResults(roundLeaderboard);
-          toast.info(`✅ Correct answer was: ${correctAnswer}`, {
+          toast.info(`Correct answer was: ${correctAnswer}`, {
             position: "top-center",
             autoClose: 3000,
             });
@@ -143,7 +143,7 @@ const WaitingRoom: React.FC = () => {
         socket.on("quiz-completed", ({ finalLeaderboard }) => {
             setQuizState("completed");
             setFinalLeaderboard(finalLeaderboard);
-          toast.info("🎉 Quiz Completed! Check the final leaderboard.", {
+          toast.info("Quiz Completed! Check the final leaderboard.", {
             position: "top-center",
             autoClose: 3000,
             });
@@ -202,6 +202,7 @@ const WaitingRoom: React.FC = () => {
                         <HostQuestionView
                             questionData={currentQuestion}
                             quizStatus={hostQuizStatus}
+                            timeRemaining={timeRemaining}
                         />
                     ) : (
                         <>

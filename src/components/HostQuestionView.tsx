@@ -20,7 +20,8 @@ interface QuestionData {
 const HostQuestionView: React.FC<{
     questionData: QuestionData;
     quizStatus: HostQuizStatus;
-}> = ({ questionData, quizStatus }) => {
+    timeRemaining: number;
+}> = ({ questionData, quizStatus, timeRemaining }) => {
     return (
         <div className="container mx-auto p-6">
             <div className="bg-white rounded-lg shadow-lg p-6">
@@ -39,7 +40,7 @@ const HostQuestionView: React.FC<{
 
                     <div className="bg-yellow-100 p-4 rounded-lg">
                         <h3 className="font-semibold">Time Remaining</h3>
-                        <p className="text-2xl">{quizStatus.timeRemaining}s</p>
+                        <p className="text-2xl">{timeRemaining}s</p>
                     </div>
                 </div>
 
