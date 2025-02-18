@@ -7,6 +7,7 @@ import WaitingRoomUI from "../components/WaitingRoomUi";
 import QuestionProgress from "../components/QuestionProgress";
 import QuestionDisplay from "../components/QuestionDisplay";
 import RoundLeaderboard from "../components/RoundLeaderboard";
+import FinalLeaderboard from "../components/FinalLeaderBoard";
 
 interface Participant {
     id: string;
@@ -139,61 +140,56 @@ const WaitingRoom: React.FC = () => {
     };
 
     return (
-        <div>
-            {quizState === "waiting" && (
-                <WaitingRoomUI
-                    roomId={roomId || ""}
-                    threadNumber={threadNumber}
-                    username={username}
-                    participants={participants}
-                    isHost={isHost}
-                    onStartQuiz={startQuestions}
-                    onStopQuiz={stopLiveQuiz}
-                />
-            )}
+      <div>
+        {quizState === "waiting" && (
+          <WaitingRoomUI
+            roomId={roomId || ""}
+            threadNumber={threadNumber}
+            username={username}
+            participants={participants}
+            isHost={isHost}
+            onStartQuiz={startQuestions}
+            onStopQuiz={stopLiveQuiz}
+          />
+        )}
 
-            {quizState === "question" && currentQuestion && (
-                <div className="container pt-20">
-                    <QuestionProgress
-                        currentQuestion={currentQuestion.questionNumber}
-                        totalQuestions={currentQuestion.totalQuestions}
-                        timeRemaining={timeRemaining}
-                    />
-                    <QuestionDisplay
-                        question={currentQuestion}
-                        onAnswerSubmit={(answer) => socket?.emit("submit-answer", { roomId, answer })}
-                    />
-                </div>
-            )}
+        {quizState === "question" && currentQuestion && (
+          <div className="container pt-20">
+            <QuestionProgress
+              currentQuestion={currentQuestion.questionNumber}
+              totalQuestions={currentQuestion.totalQuestions}
+              timeRemaining={timeRemaining}
+            />
+            <QuestionDisplay
+              question={currentQuestion}
+              onAnswerSubmit={(answer) =>
+                socket?.emit("submit-answer", { roomId, answer })
+              }
+            />
+          </div>
+        )}
 
-            {quizState === "results" && (
-                <div className="pt-20">
+        {quizState === "results" && (
+          <div className="pt-20">
+            <RoundLeaderboard
+              entries={roundResults}
+              isHost={isHost}
+              onStopQuiz={stopLiveQuiz}
+              onNextQuestion={goToNextQuestion}
+            />
+          </div>
+        )}
 
-                <RoundLeaderboard
-                    entries={roundResults}
-                    isHost={isHost}
-                    onStopQuiz={stopLiveQuiz}
-                    onNextQuestion={goToNextQuestion}
-                />
-                </div>
-            )}
-
-            {quizState === "completed" && (
-                <div className="container pt-24">
-                    <h2>🏆 Final Leaderboard 🏆</h2>
-                    <ul>
-                        {finalLeaderboard.map((entry, index) => (
-                            <li key={index}>{index + 1}. {entry.username} - {entry.totalScore} pts</li>
-                        ))}
-                    </ul>
-                    {isHost && (
-                        <button onClick={stopLiveQuiz} className="px-4 py-2 bg-red-500 text-white rounded">
-                            Stop Live Quiz
-                        </button>
-                    )}
-                </div>
-            )}
-        </div>
+        {quizState === "completed" && (
+          <div className="container pt-24">
+            <FinalLeaderboard
+              entries={finalLeaderboard}
+              isHost={isHost}
+              onStopQuiz={stopLiveQuiz}
+            />
+          </div>
+        )}
+      </div>
     );
 };
 
