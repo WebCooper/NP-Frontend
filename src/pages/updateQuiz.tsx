@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom"
-const updateQuiz = () => {
+const UpdateQuiz = () => {
   const { quizId } = useParams();
   
   return (
@@ -9,4 +9,4 @@ const updateQuiz = () => {
   )
 }
 
-export default updateQuiz
+export default UpdateQuiz
