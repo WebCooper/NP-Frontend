@@ -8,6 +8,8 @@ import QuestionProgress from "../components/QuestionProgress";
 import QuestionDisplay from "../components/QuestionDisplay";
 import RoundLeaderboard from "../components/RoundLeaderboard";
 import FinalLeaderboard from "../components/FinalLeaderBoard";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Participant {
     id: string;
@@ -71,7 +73,10 @@ const WaitingRoom: React.FC = () => {
 
         socket.on("user-joined", (data) => setParticipants([...data.participants]));
         socket.on("quiz-ended", () => {
-            alert("Quiz has been stopped!");
+          toast.info("Quiz has been stopped!", {
+            position: "top-center",
+            autoClose: 3000,
+            });
             navigate("/");
         });
 
@@ -94,19 +99,35 @@ const WaitingRoom: React.FC = () => {
         });
 
         socket.on("answer-result", ({ isCorrect }) => {
-            alert(isCorrect ? "✅ Correct!" : "❌ Wrong!");
+          if (isCorrect) {
+            toast.success("✅ Correct!", {
+              position: "top-center",
+              autoClose: 2000,
+            });
+          } else {
+            toast.error("❌ Wrong!", {
+              position: "top-center",
+              autoClose: 2000,
+            });
+          }
         });
 
         socket.on("round-results", ({ roundLeaderboard, correctAnswer }) => {
             setQuizState("results");
             setRoundResults(roundLeaderboard);
-            alert(`✅ Correct answer was: ${correctAnswer}`);
+          toast.info(`✅ Correct answer was: ${correctAnswer}`, {
+            position: "top-center",
+            autoClose: 3000,
+            });
         });
 
         socket.on("quiz-completed", ({ finalLeaderboard }) => {
             setQuizState("completed");
             setFinalLeaderboard(finalLeaderboard);
-            alert("🎉 Quiz Completed! Check the final leaderboard.");
+          toast.info("🎉 Quiz Completed! Check the final leaderboard.", {
+            position: "top-center",
+            autoClose: 3000,
+            });
         });
 
         return () => {
@@ -131,7 +152,10 @@ const WaitingRoom: React.FC = () => {
             await axios.patch(`http://localhost:4001/api/quiz/set-not-live/${quizId}`);
             socket?.emit("end-quiz", { roomId });
         } catch {
-            alert("Error stopping quiz.");
+          toast.info("Error stopping quiz.", {
+            position: "top-center",
+            autoClose: 3000,
+            });
         }
     };
 
@@ -189,6 +213,7 @@ const WaitingRoom: React.FC = () => {
             />
           </div>
         )}
+        <ToastContainer />
       </div>
     );
 };

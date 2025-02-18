@@ -2,6 +2,8 @@ import React, { useContext, useState } from 'react';
 import { createQuiz } from '../lib/utils/quiz/quizService';
 import { authContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreateQuiz: React.FC = () => {
   const [title, setTitle] = useState<string>('');
@@ -15,9 +17,17 @@ const CreateQuiz: React.FC = () => {
     try {
       const quizData = { title, userId};
       const result = await createQuiz(quizData);
+      toast.success('Quiz created successfully', {
+        position: 'top-center',
+        autoClose: 3000,
+      });
       navigate('/home')
       console.log(result);
     } catch (error) {
+      toast.error("Failed to create quiz", {
+        position: 'top-center',
+        autoClose: 3000,
+      });
       console.error(error);
     }
   };
@@ -56,6 +66,7 @@ const CreateQuiz: React.FC = () => {
           Create Quiz
         </button>
       </form>
+      <ToastContainer />
     </div>
   );
 };
