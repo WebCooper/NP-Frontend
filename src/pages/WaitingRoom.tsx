@@ -7,6 +7,9 @@ import WaitingRoomUI from "../components/WaitingRoomUi";
 import QuestionProgress from "../components/QuestionProgress";
 import QuestionDisplay from "../components/QuestionDisplay";
 import RoundLeaderboard from "../components/RoundLeaderboard";
+import FinalLeaderboard from "../components/FinalLeaderBoard";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import HostQuestionView from "../components/HostQuestionView.tsx";
 
 interface Participant {
@@ -85,7 +88,10 @@ const WaitingRoom: React.FC = () => {
 
         socket.on("user-joined", (data) => setParticipants([...data.participants]));
         socket.on("quiz-ended", () => {
-            alert("Quiz has been stopped!");
+          toast.info("Quiz has been stopped!", {
+            position: "top-center",
+            autoClose: 3000,
+            });
             navigate("/");
         });
         socket.on("quiz-status-update", (status) => {
@@ -112,19 +118,35 @@ const WaitingRoom: React.FC = () => {
         });
 
         socket.on("answer-result", ({ isCorrect }) => {
-            alert(isCorrect ? "✅ Correct!" : "❌ Wrong!");
+          if (isCorrect) {
+            toast.success("✅ Correct!", {
+              position: "top-center",
+              autoClose: 2000,
+            });
+          } else {
+            toast.error("❌ Wrong!", {
+              position: "top-center",
+              autoClose: 2000,
+            });
+          }
         });
 
         socket.on("round-results", ({ roundLeaderboard, correctAnswer }) => {
             setQuizState("results");
             setRoundResults(roundLeaderboard);
-            alert(`✅ Correct answer was: ${correctAnswer}`);
+          toast.info(`✅ Correct answer was: ${correctAnswer}`, {
+            position: "top-center",
+            autoClose: 3000,
+            });
         });
 
         socket.on("quiz-completed", ({ finalLeaderboard }) => {
             setQuizState("completed");
             setFinalLeaderboard(finalLeaderboard);
-            alert("🎉 Quiz Completed! Check the final leaderboard.");
+          toast.info("🎉 Quiz Completed! Check the final leaderboard.", {
+            position: "top-center",
+            autoClose: 3000,
+            });
         });
 
         return () => {
@@ -149,7 +171,10 @@ const WaitingRoom: React.FC = () => {
             await axios.patch(`http://localhost:4001/api/quiz/set-not-live/${quizId}`);
             socket?.emit("end-quiz", { roomId });
         } catch {
-            alert("Error stopping quiz.");
+          toast.info("Error stopping quiz.", {
+            position: "top-center",
+            autoClose: 3000,
+            });
         }
     };
 
@@ -158,18 +183,18 @@ const WaitingRoom: React.FC = () => {
     };
 
     return (
-        <div>
-            {quizState === "waiting" && (
-                <WaitingRoomUI
-                    roomId={roomId || ""}
-                    threadNumber={threadNumber}
-                    username={username}
-                    participants={participants}
-                    isHost={isHost}
-                    onStartQuiz={startQuestions}
-                    onStopQuiz={stopLiveQuiz}
-                />
-            )}
+      <div>
+        {quizState === "waiting" && (
+          <WaitingRoomUI
+            roomId={roomId || ""}
+            threadNumber={threadNumber}
+            username={username}
+            participants={participants}
+            isHost={isHost}
+            onStartQuiz={startQuestions}
+            onStopQuiz={stopLiveQuiz}
+          />
+        )}
 
             {quizState === "question" && currentQuestion && (
                 <div className="container pt-20">
@@ -194,34 +219,28 @@ const WaitingRoom: React.FC = () => {
                 </div>
             )}
 
-            {quizState === "results" && (
-                <div className="pt-20">
+        {quizState === "results" && (
+          <div className="pt-20">
+            <RoundLeaderboard
+              entries={roundResults}
+              isHost={isHost}
+              onStopQuiz={stopLiveQuiz}
+              onNextQuestion={goToNextQuestion}
+            />
+          </div>
+        )}
 
-                <RoundLeaderboard
-                    entries={roundResults}
-                    isHost={isHost}
-                    onStopQuiz={stopLiveQuiz}
-                    onNextQuestion={goToNextQuestion}
-                />
-                </div>
-            )}
-
-            {quizState === "completed" && (
-                <div className="container pt-24">
-                    <h2>🏆 Final Leaderboard 🏆</h2>
-                    <ul>
-                        {finalLeaderboard.map((entry, index) => (
-                            <li key={index}>{index + 1}. {entry.username} - {entry.totalScore} pts</li>
-                        ))}
-                    </ul>
-                    {isHost && (
-                        <button onClick={stopLiveQuiz} className="px-4 py-2 bg-red-500 text-white rounded">
-                            Stop Live Quiz
-                        </button>
-                    )}
-                </div>
-            )}
-        </div>
+        {quizState === "completed" && (
+          <div className="container pt-24">
+            <FinalLeaderboard
+              entries={finalLeaderboard}
+              isHost={isHost}
+              onStopQuiz={stopLiveQuiz}
+            />
+          </div>
+        )}
+        <ToastContainer />
+      </div>
     );
 };
 
