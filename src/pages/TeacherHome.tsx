@@ -11,10 +11,8 @@ const TeacherHome = () => {
         {/* Header Section */}
         <div className="flex justify-between items-center border-b border-gray-200 pb-8">
           <div className="text-left">
-            <h1 className="text-4xl font-bold text-gray-900 tracking-tight">
-              Teaching Space
-            </h1>
-            <p className="text-gray-600 mt-2 text-lg">
+            
+            <p className="text-blue-600 mt-2 text-xl font-semibold">
               Great to see you, {user?.name}
             </p>
           </div>
